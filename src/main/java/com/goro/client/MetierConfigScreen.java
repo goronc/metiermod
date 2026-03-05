@@ -2,7 +2,6 @@ package com.goro.client;
 
 import com.goro.config.MetierLevelConfig;
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 import com.goro.network.MetierNetwork;
 import com.goro.network.SaveConfigPacket;
 
@@ -199,10 +198,10 @@ public class MetierConfigScreen extends Screen {
     public MetierConfigScreen() {
         super(Component.literal("Configuration des Métiers"));
 
-        for (MetierPrincipal  m : MetierPrincipal.values())
+        for (MetierPrincipal m : MetierPrincipal.values())
             if (m != MetierPrincipal.AUCUN) tabs.add(m.name());
-        for (MetierSecondaire m : MetierSecondaire.values())
-            if (m != MetierSecondaire.AUCUN && !tabs.contains(m.name())) tabs.add(m.name());
+        if (!tabs.contains("MINEUR"))   tabs.add("MINEUR");
+        if (!tabs.contains("BUCHERON")) tabs.add("BUCHERON");
 
         editItems        = deepCopy(MetierLevelConfig.getAll());
         editBreaks       = deepCopy(MetierLevelConfig.getAllBreakRestrictions());

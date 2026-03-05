@@ -2,7 +2,6 @@ package com.goro.network;
 
 import com.goro.capability.PlayerMetierProvider;
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,20 +17,25 @@ public class SyncCapabilityPacket {
 
     private final MetierPrincipal  principal;
     private final int              principalLevel;
-    private final MetierSecondaire secondaire;
+    private final MetierPrincipal secondaire;
     private final int              secondaireLevel;
     private final String           maitrise;
     private final int              maitriseLevel;
+    private final int              mineurLevel;
+    private final int              bucheronLevel;
 
     public SyncCapabilityPacket(MetierPrincipal principal, int principalLevel,
-                                MetierSecondaire secondaire, int secondaireLevel,
-                                String maitrise, int maitriseLevel) {
+                                MetierPrincipal secondaire, int secondaireLevel,
+                                String maitrise, int maitriseLevel,
+                                int mineurLevel, int bucheronLevel) {
         this.principal       = principal;
         this.principalLevel  = principalLevel;
         this.secondaire      = secondaire;
         this.secondaireLevel = secondaireLevel;
         this.maitrise        = maitrise;
         this.maitriseLevel   = maitriseLevel;
+        this.mineurLevel     = mineurLevel;
+        this.bucheronLevel   = bucheronLevel;
     }
 
     public static void encode(SyncCapabilityPacket pkt, FriendlyByteBuf buf) {
@@ -41,15 +45,19 @@ public class SyncCapabilityPacket {
         buf.writeInt(pkt.secondaireLevel);
         buf.writeUtf(pkt.maitrise);
         buf.writeInt(pkt.maitriseLevel);
+        buf.writeInt(pkt.mineurLevel);
+        buf.writeInt(pkt.bucheronLevel);
     }
 
     public static SyncCapabilityPacket decode(FriendlyByteBuf buf) {
         return new SyncCapabilityPacket(
             buf.readEnum(MetierPrincipal.class),
             buf.readInt(),
-            buf.readEnum(MetierSecondaire.class),
+            buf.readEnum(MetierPrincipal.class),
             buf.readInt(),
             buf.readUtf(),
+            buf.readInt(),
+            buf.readInt(),
             buf.readInt()
         );
     }
@@ -66,6 +74,8 @@ public class SyncCapabilityPacket {
                     cap.setSecondaireLevel(pkt.secondaireLevel);
                     cap.setMaitrise(pkt.maitrise);
                     cap.setMaitriseLevel(pkt.maitriseLevel);
+                    cap.setMineurLevel(pkt.mineurLevel);
+                    cap.setBucheronLevel(pkt.bucheronLevel);
                 });
             })
         );
@@ -79,7 +89,8 @@ public class SyncCapabilityPacket {
                 new SyncCapabilityPacket(
                     cap.getPrincipal(), cap.getPrincipalLevel(),
                     cap.getSecondaire(), cap.getSecondaireLevel(),
-                    cap.getMaitrise(), cap.getMaitriseLevel()
+                    cap.getMaitrise(), cap.getMaitriseLevel(),
+                    cap.getMineurLevel(), cap.getBucheronLevel()
                 ),
                 player.connection.connection,
                 NetworkDirection.PLAY_TO_CLIENT

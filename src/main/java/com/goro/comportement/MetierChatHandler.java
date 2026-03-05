@@ -3,7 +3,6 @@ package com.goro.comportement;
 import com.goro.capability.PlayerMetierProvider;
 import com.goro.config.MetierLevelConfig;
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -32,7 +31,7 @@ public class MetierChatHandler {
         player.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
             String maitrise = cap.getMaitrise();
             MetierPrincipal principal = cap.getPrincipal();
-            MetierSecondaire secondaire = cap.getSecondaire();
+            MetierPrincipal secondaire = cap.getSecondaire();
 
             if (!maitrise.isEmpty()) {
                 labelHolder[0] = maitrise;
@@ -40,7 +39,7 @@ public class MetierChatHandler {
             } else if (principal != MetierPrincipal.AUCUN) {
                 labelHolder[0] = principal.name();
                 colorKey[0]    = principal.name();
-            } else if (secondaire != MetierSecondaire.AUCUN) {
+            } else if (secondaire != MetierPrincipal.AUCUN) {
                 labelHolder[0] = secondaire.name();
                 colorKey[0]    = secondaire.name();
             }

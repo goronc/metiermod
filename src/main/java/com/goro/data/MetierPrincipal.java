@@ -8,6 +8,7 @@ public enum MetierPrincipal {
     CHASSEUR,
     FERMIER,
     TAVERNIER,
-    PECHEUR
+    PECHEUR,
+    APHOTICAIRE;
 
 }

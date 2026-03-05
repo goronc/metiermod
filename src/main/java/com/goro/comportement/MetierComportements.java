@@ -545,8 +545,12 @@ public class MetierComportements {
         return result[0];
     }
 
-    /** Retourne le niveau effectif du joueur pour un métier donné (principal, secondaire ou maîtrise). */
+    /** Retourne le niveau effectif du joueur pour un métier donné (principal, secondaire, maîtrise ou base). */
     private int getPlayerLevelForMetier(IPlayerMetier cap, String metierName) {
+        // Métiers de base universels — tout le monde en a un niveau
+        if (metierName.equals("MINEUR"))   return cap.getMineurLevel();
+        if (metierName.equals("BUCHERON")) return cap.getBucheronLevel();
+
         int level = 0;
         if (cap.getPrincipal().name().equals(metierName))
             level = Math.max(level, cap.getPrincipalLevel());

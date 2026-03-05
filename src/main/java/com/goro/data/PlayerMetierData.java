@@ -7,7 +7,7 @@ public class PlayerMetierData {
 
     public static class Data {
         public MetierPrincipal principal = MetierPrincipal.AUCUN;
-        public MetierSecondaire secondaire = MetierSecondaire.AUCUN;
+        public MetierPrincipal secondaire = MetierPrincipal.AUCUN;
     }
 
     private static final HashMap<UUID, Data> PLAYERS = new HashMap<>();

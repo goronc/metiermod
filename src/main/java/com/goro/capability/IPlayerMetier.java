@@ -1,7 +1,6 @@
 package com.goro.capability;
 
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 import net.minecraft.nbt.CompoundTag;
 
 public interface IPlayerMetier {
@@ -9,8 +8,8 @@ public interface IPlayerMetier {
     MetierPrincipal getPrincipal();
     void setPrincipal(MetierPrincipal metier);
 
-    MetierSecondaire getSecondaire();
-    void setSecondaire(MetierSecondaire metier);
+    MetierPrincipal getSecondaire();
+    void setSecondaire(MetierPrincipal metier);
 
     int getPrincipalLevel();
     void setPrincipalLevel(int level);
@@ -24,6 +23,12 @@ public interface IPlayerMetier {
 
     int getMaitriseLevel();
     void setMaitriseLevel(int level);
+
+    int getMineurLevel();
+    void setMineurLevel(int level);
+
+    int getBucheronLevel();
+    void setBucheronLevel(int level);
 
     CompoundTag saveNBT();
     void loadNBT(CompoundTag nbt);

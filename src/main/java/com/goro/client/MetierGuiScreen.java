@@ -2,7 +2,6 @@ package com.goro.client;
 
 import com.goro.config.MetierLevelConfig;
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 import com.goro.network.MetierNetwork;
 import com.goro.network.SaveConfigPacket;
 
@@ -49,8 +48,8 @@ public class MetierGuiScreen extends Screen {
         // Onglets dynamiques : un par métier (principal + secondaire, sans doublons)
         for (MetierPrincipal m : MetierPrincipal.values())
             if (m != MetierPrincipal.AUCUN) tabs.add(m.name());
-        for (MetierSecondaire m : MetierSecondaire.values())
-            if (m != MetierSecondaire.AUCUN && !tabs.contains(m.name())) tabs.add(m.name());
+        if (!tabs.contains("MINEUR"))   tabs.add("MINEUR");
+        if (!tabs.contains("BUCHERON")) tabs.add("BUCHERON");
 
         activeTab = tabs.isEmpty() ? "" : tabs.get(0);
         editData  = deepCopy(MetierLevelConfig.getAll());

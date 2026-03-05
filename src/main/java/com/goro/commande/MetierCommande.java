@@ -17,7 +17,6 @@ import com.goro.capability.PlayerMetierProvider;
 import com.goro.comportement.MetierComportements;
 import com.goro.config.MetierLevelConfig;
 import com.goro.data.MetierPrincipal;
-import com.goro.data.MetierSecondaire;
 import com.goro.network.MetierNetwork;
 import com.goro.network.OpenGuiPacket;
 import com.goro.network.SyncCapabilityPacket;
@@ -47,10 +46,16 @@ public class MetierCommande {
                             String maitriseStr = c.getMaitrise().isEmpty() ? "" :
                                 "  |  Maîtrise : " + c.getMaitrise() +
                                 " (niv. " + c.getMaitriseLevel() + "/" + MetierLevelConfig.getMaxLevel(c.getMaitrise()) + ")";
+                            int mMax = MetierLevelConfig.getMaxLevel("MINEUR");
+                            int bMax = MetierLevelConfig.getMaxLevel("BUCHERON");
                             player.sendSystemMessage(Component.literal(
                                 "Principal : " + c.getPrincipal() + " (niv. " + c.getPrincipalLevel() + "/" + pMax + ")" +
                                 "  |  Secondaire : " + c.getSecondaire() + " (niv. " + c.getSecondaireLevel() + "/" + sMax + ")" +
                                 maitriseStr
+                            ));
+                            player.sendSystemMessage(Component.literal(
+                                "Mineur : niv. " + c.getMineurLevel() + "/" + mMax +
+                                "  |  Bûcheron : niv. " + c.getBucheronLevel() + "/" + bMax
                             ));
                             return 1;
                         } else {
@@ -60,12 +65,56 @@ public class MetierCommande {
                     })
                 )
 
-                // /metier level add|remove <joueur> principal|secondaire  — op level 2
+                // /metier level add|remove <joueur> principal|secondaire|mineur|bucheron  — op level 2
                 .then(literal("level")
                     .requires(source -> source.hasPermission(2))
 
                     .then(literal("remove")
                         .then(Commands.argument("joueur", EntityArgument.player())
+                            .then(literal("mineur")
+                                .executes(context -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                    target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
+                                        int actuel = cap.getMineurLevel();
+                                        if (actuel <= 1) {
+                                            context.getSource().sendSystemMessage(Component.literal(
+                                                target.getName().getString() + " est déjà au niveau minimum (1) en mineur."));
+                                            return;
+                                        }
+                                        cap.setMineurLevel(actuel - 1);
+                                        int nouveau = cap.getMineurLevel();
+                                        int max = MetierLevelConfig.getMaxLevel("MINEUR");
+                                        target.sendSystemMessage(Component.literal(
+                                            "Ton métier Mineur est maintenant niveau " + nouveau + "/" + max + "."));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → Mineur niv. " + nouveau + "/" + max), true);
+                                    });
+                                    SyncCapabilityPacket.sendTo(target);
+                                    return 1;
+                                })
+                            )
+                            .then(literal("bucheron")
+                                .executes(context -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                    target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
+                                        int actuel = cap.getBucheronLevel();
+                                        if (actuel <= 1) {
+                                            context.getSource().sendSystemMessage(Component.literal(
+                                                target.getName().getString() + " est déjà au niveau minimum (1) en bûcheron."));
+                                            return;
+                                        }
+                                        cap.setBucheronLevel(actuel - 1);
+                                        int nouveau = cap.getBucheronLevel();
+                                        int max = MetierLevelConfig.getMaxLevel("BUCHERON");
+                                        target.sendSystemMessage(Component.literal(
+                                            "Ton métier Bûcheron est maintenant niveau " + nouveau + "/" + max + "."));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → Bûcheron niv. " + nouveau + "/" + max), true);
+                                    });
+                                    SyncCapabilityPacket.sendTo(target);
+                                    return 1;
+                                })
+                            )
                             .then(literal("principal")
                                 .executes(context -> {
                                     ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
@@ -142,6 +191,50 @@ public class MetierCommande {
 
                     .then(literal("add")
                         .then(Commands.argument("joueur", EntityArgument.player())
+                            .then(literal("mineur")
+                                .executes(context -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                    target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
+                                        int actuel = cap.getMineurLevel();
+                                        int max = MetierLevelConfig.getMaxLevel("MINEUR");
+                                        if (actuel >= max) {
+                                            context.getSource().sendSystemMessage(Component.literal(
+                                                target.getName().getString() + " est déjà au niveau max (" + max + ") en mineur."));
+                                            return;
+                                        }
+                                        cap.setMineurLevel(actuel + 1);
+                                        int nouveau = cap.getMineurLevel();
+                                        target.sendSystemMessage(Component.literal(
+                                            "Ton métier Mineur est maintenant niveau " + nouveau + "/" + max + " !"));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → Mineur niv. " + nouveau + "/" + max), true);
+                                    });
+                                    SyncCapabilityPacket.sendTo(target);
+                                    return 1;
+                                })
+                            )
+                            .then(literal("bucheron")
+                                .executes(context -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                    target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
+                                        int actuel = cap.getBucheronLevel();
+                                        int max = MetierLevelConfig.getMaxLevel("BUCHERON");
+                                        if (actuel >= max) {
+                                            context.getSource().sendSystemMessage(Component.literal(
+                                                target.getName().getString() + " est déjà au niveau max (" + max + ") en bûcheron."));
+                                            return;
+                                        }
+                                        cap.setBucheronLevel(actuel + 1);
+                                        int nouveau = cap.getBucheronLevel();
+                                        target.sendSystemMessage(Component.literal(
+                                            "Ton métier Bûcheron est maintenant niveau " + nouveau + "/" + max + " !"));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → Bûcheron niv. " + nouveau + "/" + max), true);
+                                    });
+                                    SyncCapabilityPacket.sendTo(target);
+                                    return 1;
+                                })
+                            )
                             .then(literal("principal")
                                 .executes(context -> {
                                     ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
@@ -285,7 +378,7 @@ public class MetierCommande {
                                         ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
                                         String input = StringArgumentType.getString(context, "metier").toUpperCase();
                                         try {
-                                            MetierSecondaire m = MetierSecondaire.valueOf(input);
+                                            MetierPrincipal m = MetierPrincipal.valueOf(input);
                                             target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
                                                 cap.setSecondaire(m);
                                                 cap.setSecondaireLevel(1);
@@ -345,7 +438,7 @@ public class MetierCommande {
                                 .executes(context -> {
                                     ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
                                     target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap -> {
-                                        cap.setSecondaire(MetierSecondaire.AUCUN);
+                                        cap.setSecondaire(MetierPrincipal.AUCUN);
                                         cap.setSecondaireLevel(0);
                                     });
                                     context.getSource().sendSuccess(() -> Component.literal(
@@ -418,6 +511,38 @@ public class MetierCommande {
                                             target.getName().getString() + " → maîtrise niv. " + niveau), true);
                                         target.sendSystemMessage(Component.literal(
                                             "§6[Admin] Niveau maîtrise défini à §e" + niveau));
+                                        SyncCapabilityPacket.sendTo(target);
+                                        return 1;
+                                    })
+                                )
+                            )
+                            .then(literal("mineur")
+                                .then(Commands.argument("niveau", IntegerArgumentType.integer(0))
+                                    .executes(context -> {
+                                        ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                        int niveau = IntegerArgumentType.getInteger(context, "niveau");
+                                        target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap ->
+                                            cap.setMineurLevel(niveau));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → mineur niv. " + niveau), true);
+                                        target.sendSystemMessage(Component.literal(
+                                            "§6[Admin] Niveau mineur défini à §e" + niveau));
+                                        SyncCapabilityPacket.sendTo(target);
+                                        return 1;
+                                    })
+                                )
+                            )
+                            .then(literal("bucheron")
+                                .then(Commands.argument("niveau", IntegerArgumentType.integer(0))
+                                    .executes(context -> {
+                                        ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                                        int niveau = IntegerArgumentType.getInteger(context, "niveau");
+                                        target.getCapability(PlayerMetierProvider.METIER_CAP).ifPresent(cap ->
+                                            cap.setBucheronLevel(niveau));
+                                        context.getSource().sendSuccess(() -> Component.literal(
+                                            target.getName().getString() + " → bûcheron niv. " + niveau), true);
+                                        target.sendSystemMessage(Component.literal(
+                                            "§6[Admin] Niveau bûcheron défini à §e" + niveau));
                                         SyncCapabilityPacket.sendTo(target);
                                         return 1;
                                     })
