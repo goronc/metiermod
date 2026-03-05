@@ -14,7 +14,7 @@ Restreint l'accès aux items, blocs, recettes, potions, élevage, pêche, chasse
 selon le métier et le niveau du joueur.
 Entièrement configurable en jeu via une interface d'administration.
 '''
-displayURL=""
+displayURL="https://github.com/goronc/metiermod"
 
 [[dependencies.metiermod]]
     modId="forge"

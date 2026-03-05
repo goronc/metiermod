@@ -5,7 +5,5 @@ public enum MetierSecondaire {
     AUCUN,
     MINEUR,
     BUCHERON,
-    ARTISTE,
-    FERMIER,
-    PECHEUR;
+    ARTISTE;
 }
