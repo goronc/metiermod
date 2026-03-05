@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="metiermod"
+version="1.0.0"
+displayName="Métier Mod"
+logoFile="metiermod.png"
+authors="Goro"
+description='''
+Système de métiers pour serveur Minecraft.
+Restreint l'accès aux items, blocs, recettes, potions, élevage, pêche, chasse et fonte
+selon le métier et le niveau du joueur.
+Entièrement configurable en jeu via une interface d'administration.
+'''
+displayURL=""
+
+[[dependencies.metiermod]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.metiermod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
